@@ -17,6 +17,7 @@ import { MockInterView } from "../../../utils/schema";
 import { v4 as uuidv4 } from "uuid";
 import { useUser } from "@clerk/nextjs";
 import moment from "moment";
+import { useRouter } from "next/navigation";
 
 function AddnewInterView() {
   const [open, setOpen] = useState(false);
@@ -25,7 +26,11 @@ function AddnewInterView() {
   const [jobExperience, setJobExperience] = useState("");
   const [loading, setLoading] = useState(false);
   const [jsonResult, setJsonResult] = useState([]);
+  const router = useRouter();
   const { user } = useUser();
+
+  if (!user) return <div>Loading...</div>;
+
   function handleToggleModal() {
     setOpen(!open);
   }
@@ -42,6 +47,7 @@ function AddnewInterView() {
       const chatSession = await createChatSession();
       if (!chatSession) {
         console.error("Chat session not initialized properly");
+        setLoading(false);
         return;
       }
 
@@ -50,38 +56,37 @@ function AddnewInterView() {
 
       // Send the prompt
       const result = await chatSession.sendMessage(inputPrompt);
+
+      // Handle the response
       const parsedJson = result.response
-        .text()
         .replace("```json", "")
         .replace("```", "");
+      const jsonData = JSON.parse(parsedJson);
 
-      console.log("Parsed JSON:", JSON.parse(parsedJson));
+      console.log("Parsed JSON:", jsonData);
 
       // Insert into the database
-      if (!parsedJson) {
-        console.log("something went wrong");
-        return;
-      }
-      if (parsedJson) {
-        setOpen(false);
-      }
       const mockResult = await db
         .insert(MockInterView)
         .values({
           mockId: uuidv4(),
-          jsonMockResp: parsedJson,
+          jsonMockResp: jsonData,
           jsonPosition: jobPosition,
           jobExperience: jobExperience,
           jobDesc: jobDescription,
-          createdBy: user?.primaryEmailAddress.emailAddress,
+          createdBy: user?.primaryEmailAddress?.emailAddress || "anonymous",
           createdAt: moment().format("DD-MM-YYYY"),
           updatedAt: moment().format("DD-MM-YYYY"),
         })
         .returning({ mockId: MockInterView.mockId });
 
+      if (mockResult) {
+        setOpen(false);
+        router.push(`/interview/${mockResult[0].mockId}`);
+      }
       console.log("Generated Questions:", mockResult);
     } catch (error) {
-      console.error("Error generating questions:", error.message); // Log just the error message
+      console.error("Error generating questions:", error);
     } finally {
       setLoading(false);
     }
@@ -147,7 +152,7 @@ function AddnewInterView() {
                     ) : (
                       <>
                         <LoaderCircle />
-                        "loading"
+                        Loading...
                       </>
                     )}
                   </Button>
