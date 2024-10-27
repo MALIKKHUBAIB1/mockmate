@@ -37,7 +37,7 @@ function AddnewInterView() {
 
   async function handleSubmitForm(e) {
     e.preventDefault();
-    console.log(jobDescription, jobPosition, jobExperience);
+    // console.log(jobDescription, jobPosition, jobExperience);
 
     try {
       // Set loading state to true
@@ -46,7 +46,7 @@ function AddnewInterView() {
       // Get a valid chat session
       const chatSession = await createChatSession();
       if (!chatSession) {
-        console.error("Chat session not initialized properly");
+        // console.error("Chat session not initialized properly");
         setLoading(false);
         return;
       }
@@ -63,7 +63,7 @@ function AddnewInterView() {
         .replace("```", "");
       const jsonData = JSON.parse(parsedJson);
 
-      console.log("Parsed JSON:", jsonData);
+      // console.log("Parsed JSON:", jsonData);
 
       // Insert into the database
       const mockResult = await db
@@ -84,9 +84,9 @@ function AddnewInterView() {
         setOpen(false);
         router.push(`/interview/${mockResult[0].mockId}`);
       }
-      console.log("Generated Questions:", mockResult);
+      // console.log("Generated Questions:", mockResult);
     } catch (error) {
-      console.error("Error generating questions:", error);
+      // console.error("Error generating questions:", error);
     } finally {
       setLoading(false);
     }

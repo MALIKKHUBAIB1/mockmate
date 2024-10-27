@@ -1,10 +1,8 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
-
-// export default nextConfig;
-// next.config.mjs
-export default {
+const nextConfig = {
   images: {
-    domains: ["cdn-dkeek.nitrocdn.com"],
+    domains: ["img.freepik.com", "cdn-dkeek.nitrocdn.com"], // Add all needed domains
   },
 };
+
+export default nextConfig;

@@ -7,7 +7,7 @@ import React from "react";
 function Header() {
   const path = usePathname();
   
-  console.log(path);
+  // console.log(path);
   return (
     <div className="flex justify-between p-4 bg-secondary shadow-md">
       <Image
